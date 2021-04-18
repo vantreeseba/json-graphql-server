@@ -4,6 +4,7 @@ import {
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
+    GraphQLInputObjectType,
     GraphQLSchema,
     GraphQLString,
     parse,
@@ -139,9 +140,28 @@ export default (data) => {
                 },
                 {}
             );
+
+            // Build input type.
+            var inputFields = { ...typeFields };
+            Object.keys(inputFields).forEach((key) => {
+                delete inputFields[key].resolve;
+            });
+            var inputType = new GraphQLInputObjectType({
+                name: type.name + 'Input',
+                fields: inputFields,
+            });
+
             fields[`create${type.name}`] = {
                 type: typesByName[type.name],
                 args: typeFields,
+            };
+            fields[`createMany${type.name}`] = {
+                type: new GraphQLList(typesByName[type.name]),
+                args: {
+                    data: {
+                        type: new GraphQLList(inputType),
+                    },
+                },
             };
             fields[`update${type.name}`] = {
                 type: typesByName[type.name],
