@@ -107,6 +107,7 @@ type Query {
 }
 type Mutation {
   createPost(data: String): Post
+  createManyPost(data: [{data:String}]): [Post]
   updatePost(data: String): Post
   removePost(id: ID!): Boolean
 }
