@@ -42,7 +42,7 @@ json-graphql-server db.js
 ```
 
 To use a port other than 3000, you can run `json-graphql-server db.js --p <your port here>`
-To use a host other than localhost, you can run `json-graphql-server db.js --h <your port here>`
+To use a host other than localhost, you can run `json-graphql-server db.js --h <your host here>`
 
 Now you can query your data in graphql. For instance, to issue the following query:
 
@@ -123,16 +123,16 @@ type Post {
 type PostFilter {
     q: String
     id: ID
+    id_neq: ID
     title: String
+    title_neq: String
     views: Int
     views_lt: Int
     views_lte: Int
     views_gt: Int
     views_gte: Int
-    user_id: ID    
-    id_neq: ID
-    title_neq: ID
     views_neq: Int
+    user_id: ID    
     user_id_neq: ID
 }
 type ListMetadata {
@@ -581,6 +581,33 @@ graphql(schema, query).then(result => {
 ```
 
 Or available in the global scope when running on a client as `jsonSchemaBuilder`.
+
+## Plain Schema
+
+If you want to use another server type instead of the built in graphql express,
+like apollo-server or etc, you can expose the plain schema to be built into
+an executable schema (there may be version issues otherwise).
+
+This uses the export `getPlainSchema`.
+
+```js
+import {ApolloServer} from 'apollo-server';
+import {makeExecutableSchema} from '@graphql-tools/schema'; // or graphql-tools
+import {applyMiddleware} from 'graphql-middleware';
+import {getPlainSchema} from 'json-graphql-server';
+
+const data = { };
+const schema = applyMiddleware(
+  makeExecutableSchema(getPlainSchema(data), exampleMiddleware)
+);
+
+const server = new ApolloServer({
+  schema
+});
+
+server.listen({ port:3000 });
+
+```
 
 ## Deployment
 
